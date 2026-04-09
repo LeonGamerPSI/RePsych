@@ -137,11 +137,6 @@ class Note extends FlxSprite
 
 	public function resizeByRatio(ratio:Float) // haha funny twitter shit
 	{
-		if (isSustainNote && animation.curAnim != null && !animation.curAnim.name.endsWith('end'))
-		{
-			scale.y *= ratio;
-			updateHitbox();
-		}
 	}
 
 	private function set_texture(value:String):String
@@ -194,7 +189,7 @@ class Note extends FlxSprite
 
 					// gameplay data
 					lowPriority = true;
-					missHealth = isSustainNote ? 0.25 : 0.1;
+					missHealth = 0.1;
 					hitCausesMiss = true;
 					hitsound = 'cancelMenu';
 					hitsoundChartEditor = false;
@@ -250,7 +245,7 @@ class Note extends FlxSprite
 				rgbShader.enabled = false;
 
 			x += swagWidth * (noteData);
-			if (!isSustainNote && noteData < colArray.length)
+			if (noteData < colArray.length)
 			{ // Doing this 'if' check to fix the warnings on Senpai songs
 				var animToPlay:String = '';
 				animToPlay = colArray[noteData % colArray.length];
@@ -258,61 +253,11 @@ class Note extends FlxSprite
 			}
 		}
 
-		// trace(prevNote);
-
 		if (prevNote != null)
 			prevNote.nextNote = this;
 
-		if (isSustainNote && prevNote != null)
-		{
-			alpha = 0.6;
-			multAlpha = 0.6;
-			hitsoundDisabled = true;
-			if (ClientPrefs.data.downScroll)
-				flipY = true;
-
-			offsetX += width / 2;
-			copyAngle = false;
-
-			animation.play(colArray[noteData % colArray.length] + 'holdend');
-
-			updateHitbox();
-
-			offsetX -= width / 2;
-
-			if (PlayState.isPixelStage)
-				offsetX += 30;
-
-			if (prevNote.isSustainNote)
-			{
-				prevNote.animation.play(colArray[prevNote.noteData % colArray.length] + 'hold');
-
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
-				if (createdFrom != null && createdFrom.songSpeed != null)
-					prevNote.scale.y *= createdFrom.songSpeed;
-
-				if (PlayState.isPixelStage)
-				{
-					prevNote.scale.y *= 1.19;
-					prevNote.scale.y *= (6 / height); // Auto adjust note size
-				}
-				prevNote.updateHitbox();
-				// prevNote.setGraphicSize();
-			}
-
-			if (PlayState.isPixelStage)
-			{
-				scale.y *= PlayState.daPixelZoom;
-				updateHitbox();
-			}
-			earlyHitMult = 0;
-		}
-		else if (!isSustainNote)
-		{
-			centerOffsets();
-			centerOrigin();
-		}
-		x += offsetX;
+		centerOffsets();
+		centerOrigin();
 	}
 
 	static var rgbs:Array<RGBShaderReference> = [];
@@ -385,43 +330,22 @@ class Note extends FlxSprite
 
 		if (PlayState.isPixelStage)
 		{
-			if (isSustainNote)
-			{
-				var graphic = Paths.image('pixelUI/' + skinPixel + 'ENDS' + skinPostfix);
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 2));
-				originalHeight = graphic.height / 2;
-			}
-			else
-			{
-				var graphic = Paths.image('pixelUI/' + skinPixel + skinPostfix);
-				loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
-			}
+			var graphic = Paths.image('pixelUI/' + skinPixel + skinPostfix);
+			loadGraphic(graphic, true, Math.floor(graphic.width / 4), Math.floor(graphic.height / 5));
+
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 			loadPixelNoteAnims();
 			antialiasing = false;
-
-			if (isSustainNote)
-			{
-				offsetX += _lastNoteOffX;
-				_lastNoteOffX = (width - 7) * (PlayState.daPixelZoom / 2);
-				offsetX -= _lastNoteOffX;
-			}
 		}
 		else
 		{
 			frames = Paths.getSparrowAtlas(skin);
 			loadNoteAnims();
-			if (!isSustainNote)
-			{
-				centerOffsets();
-				centerOrigin();
-			}
+
+			centerOffsets();
+			centerOrigin();
 		}
 
-		if (isSustainNote)
-		{
-			scale.y = lastScaleY;
-		}
 		updateHitbox();
 
 		if (animName != null)
@@ -438,14 +362,10 @@ class Note extends FlxSprite
 
 	function loadNoteAnims()
 	{
-		if (isSustainNote)
-		{
-			attemptToAddAnimationByPrefix('purpleholdend', 'pruple end hold', 24, true); // this fixes some retarded typo from the original note .FLA
-			animation.addByPrefix(colArray[noteData] + 'holdend', colArray[noteData] + ' hold end', 24, true);
-			animation.addByPrefix(colArray[noteData] + 'hold', colArray[noteData] + ' hold piece', 24, true);
-		}
-		else
-			animation.addByPrefix(colArray[noteData] + 'Scroll', colArray[noteData] + '0');
+		attemptToAddAnimationByPrefix('holdend', 'pruple end hold', 24, true); // this fixes some retarded typo from the original note .FLA
+		animation.addByPrefix('holdend', colArray[noteData] + ' hold end', 24, true);
+		animation.addByPrefix('hold', colArray[noteData] + ' hold piece', 24, true);
+		animation.addByPrefix(colArray[noteData] + 'Scroll', colArray[noteData] + '0');
 
 		setGraphicSize(Std.int(width * 0.7));
 		updateHitbox();
@@ -453,13 +373,7 @@ class Note extends FlxSprite
 
 	function loadPixelNoteAnims()
 	{
-		if (isSustainNote)
-		{
-			animation.add(colArray[noteData] + 'holdend', [noteData + 4], 24, true);
-			animation.add(colArray[noteData] + 'hold', [noteData], 24, true);
-		}
-		else
-			animation.add(colArray[noteData] + 'Scroll', [noteData + 4], 24, true);
+		animation.add(colArray[noteData] + 'Scroll', [noteData + 4], 24, true);
 	}
 
 	function attemptToAddAnimationByPrefix(name:String, prefix:String, framerate:Float = 24, doLoop:Bool = true)
@@ -489,11 +403,8 @@ class Note extends FlxSprite
 		{
 			canBeHit = false;
 
-			if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult))
-			{
-				if ((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition)
-					wasGoodHit = true;
-			}
+			if (strumTime <= Conductor.songPosition)
+				wasGoodHit = true;
 		}
 
 		if (tooLate && !inEditor)
@@ -530,49 +441,11 @@ class Note extends FlxSprite
 			x = strumX + offsetX;
 
 		if (copyY)
-		{
 			y = strumY + offsetY + correctionOffset + distance;
-			if (myStrum.downScroll && isSustainNote)
-				y -= height;
-		}
 	}
 
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
-		var center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
-		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
-		{
-			var swagRect:FlxRect = clipRect;
-			if (swagRect == null)
-				swagRect = new FlxRect(0, 0, frameWidth, frameHeight);
-
-			if (myStrum.downScroll)
-			{
-				if (y - offset.y * scale.y + height >= center)
-				{
-					swagRect.width = frameWidth;
-					swagRect.height = (center - y) / scale.y;
-					swagRect.y = frameHeight - swagRect.height;
-				}
-			}
-			else if (y + offset.y * scale.y <= center)
-			{
-				swagRect.y = (center - y) / scale.y;
-				swagRect.width = width / scale.x;
-				swagRect.height = (height / scale.y) - swagRect.y;
-			}
-			clipRect = swagRect;
-		}
-	}
-
-	@:noCompletion
-	override function set_clipRect(rect:FlxRect):FlxRect
-	{
-		clipRect = rect;
-
-		if (frames != null)
-			frame = frames.frames[animation.frameIndex];
-
-		return rect;
+		return;
 	}
 }

@@ -1,49 +1,53 @@
 [
-  {
-    "profile": "default",
-    "pkgs": [
-      {
-        "name": "lime",
-        "version": "8.2.2"
-      },
-      {
-        "name": "openfl",
-        "version": "9.4.2"
-      },
-      {
-        "name": "flixel",
-        "version": "5.8.0"
-      },
-      {
-        "name": "flixel-ui"
-      },
-      {
-        "name": "flixel-addons"
-      },
-      {
-        "name": "SScript",
-        "link": "https://github.com/Snirozu/SScript-7.7.0.git"
-      },
-      {
-        "name": "hxCodec",
-        "version": "3.0.2"
-      },
-      {
-        "name": "flxanimate",
-        "link": "https://github.com/ShadowMario/flxanimate",
-        "branch": "dev"
-      },
-      {
-        "name": "hxdiscord_rpc",
-        "version": "1.2.4"
-      },
-      {
-        "name": "tjson"
-      },
-      {
-        "name": "hxcpp",
-        "link": "https://github.com/HaxeFoundation/hxcpp"
-      }
-    ]
-  }
+	{
+		"profile": "default",
+		"pkgs": [
+			{
+				"name": "lime",
+				"version": "8.2.2"
+			},
+			{
+				"name": "openfl",
+				"version": "9.4.2"
+			},
+			{
+				"name": "flixel",
+				"version": "5.8.0"
+			},
+			{
+				"name": "flixel-ui"
+			},
+			{
+				"name": "flixel-addons"
+			},
+			{
+				"name": "SScript",
+				"link": "https://github.com/Snirozu/SScript-7.7.0.git"
+			},
+			{
+				"name": "hxCodec",
+				"version": "3.0.2"
+			},
+			{
+				"name": "flxanimate",
+				"link": "https://github.com/ShadowMario/flxanimate",
+				"branch": "dev"
+			},
+			{
+				"name": "hxdiscord_rpc",
+				"version": "1.2.4"
+			},
+			{
+				"name": "tjson"
+			},
+			{
+				"name": "hxcpp",
+				"link": "https://github.com/HaxeFoundation/hxcpp"
+			},
+			{
+				"name": "lemonui",
+				"link": "https://github.com/NebulaStellaNova/LemonUI.git"
+			}
+		]
+	}
 ]
