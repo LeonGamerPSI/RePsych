@@ -34,10 +34,6 @@
         "branch": "dev"
       },
       {
-        "name": "linc_luajit",
-        "link": "https://github.com/superpowers04/linc_luajit"
-      },
-      {
         "name": "hxdiscord_rpc",
         "version": "1.2.4"
       },
