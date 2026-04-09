@@ -232,7 +232,7 @@ class Note extends FlxSprite
 
 		if(noteData > -1) {
 			texture = '';
-			rgbShader = new RGBShaderReference(this, initializeGlobalRGBShader(noteData));
+			rgbShader = getRGBShiftOf(noteData,this);
 			if(PlayState.SONG != null && PlayState.SONG.disableNoteRGB) rgbShader.enabled = false;
 
 			x += swagWidth * (noteData);
@@ -295,6 +295,14 @@ class Note extends FlxSprite
 			centerOrigin();
 		}
 		x += offsetX;
+	}
+
+	static var rgbs:Array<RGBShaderReference> = [];
+	public static function getRGBShiftOf(noteData:Int, spr:FlxSprite) {
+		var shader = rgbs[noteData] ?? new RGBShaderReference(spr, initializeGlobalRGBShader(noteData));
+		if(!rgbs.contains(shader))
+			rgbs[noteData] = shader;
+		return shader;
 	}
 
 	public static function initializeGlobalRGBShader(noteData:Int)
