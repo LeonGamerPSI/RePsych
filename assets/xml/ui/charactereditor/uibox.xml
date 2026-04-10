@@ -1,0 +1,17 @@
+<!DOCTYPE charactereditor>
+
+
+<tab-panel id='tabs' width="250" height="120">
+    <tab name="Settings" id='tab1'>
+        <textinput id='charNameTxt' x='10' y='30' fieldWidth='150' defaultValue='dad'
+            label='Enter Character JSON name here...' />
+        <button x='10' y='10' height="15" text='Reload Char' id='reloadCharBTN' />
+        <tickbox id='isPlayer' y='53' x='170' label='Is PLR' checked="true" />
+    </tab>
+
+    <tab name="Ghost" id='tab2'>
+        <button height="15" x="10" text='place ghost' id='placeGhost' />
+        <tickbox height="15" x="10" y="20" label='highlight ghost' id='highGhost' />
+        <slider label="Ghost Alpha" x="10" y="40" id="ghostAlpha" defaultValue="0.6" />
+    </tab>
+</tab-panel>
