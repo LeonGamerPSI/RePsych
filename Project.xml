@@ -110,6 +110,7 @@
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" />
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED" />
 	<haxelib name="flxanimate" />
+	<haxelib name="box2d" />
 
 	<!-- Disable Discord IO Thread -->
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="hxdiscord_rpc" />
@@ -182,6 +183,7 @@
 	fixes-->
 	<haxeflag name="--macro" value="allowPackage('flash')" />
 	<haxeflag name="--macro" value="include('my.pack')" />
+	<haxeflag name="--macro" value="include('box2D')" />
 
 	<!-- _________________________________ Custom _______________________________ -->
 

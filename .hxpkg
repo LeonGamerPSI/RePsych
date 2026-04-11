@@ -47,6 +47,10 @@
 			{
 				"name": "lemonui",
 				"link": "https://github.com/NebulaStellaNova/LemonUI.git"
+			},
+			{
+				"name": "box2d",
+				"link": "https://github.com/openfl/box2d.git"
 			}
 		]
 	}

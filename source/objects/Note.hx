@@ -1,5 +1,6 @@
 package objects;
 
+import addons.rendering.TiledRenderer;
 import backend.animation.PsychAnimationController;
 import backend.NoteTypesConfig;
 import shaders.RGBPalette;
@@ -43,6 +44,7 @@ class Note extends FlxSprite
 	public var noteData:Int = 0;
 
 	public var mustPress:Bool = false;
+	public var hit:Bool = false;
 	public var canBeHit:Bool = false;
 	public var tooLate:Bool = false;
 
@@ -86,6 +88,8 @@ class Note extends FlxSprite
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	public static var defaultNoteSkin(default, never):String = 'noteSkins/NOTE_assets';
+
+	public var holdNote:Sustain;
 
 	public var noteSplashData:NoteSplashData = {
 		disabled: false,
@@ -173,6 +177,7 @@ class Note extends FlxSprite
 			{
 				case 'Hurt Note':
 					ignoreNote = mustPress;
+					copyShader = false;
 					// reloadNote('HURTNOTE_assets');
 					// this used to change the note texture to HURTNOTE_assets.png,
 					// but i've changed it to something more optimized with the implementation of RGBPalette:
@@ -215,6 +220,7 @@ class Note extends FlxSprite
 		super();
 
 		animation = new PsychAnimationController(this);
+		//	susStrip = new MeshRender(0, 0);
 
 		antialiasing = ClientPrefs.data.antialiasing;
 		if (createdFrom == null)
@@ -241,6 +247,8 @@ class Note extends FlxSprite
 		{
 			texture = '';
 			rgbShader = getRGBShiftOf(noteData, this);
+			// susStrip.shader = shader;
+
 			if (PlayState.SONG != null && PlayState.SONG.disableNoteRGB)
 				rgbShader.enabled = false;
 
@@ -369,6 +377,7 @@ class Note extends FlxSprite
 
 		setGraphicSize(Std.int(width * 0.7));
 		updateHitbox();
+		// susStrip.loadGraphic(frames.frames[animation.getByName('hold').frames[0]].paint());
 	}
 
 	function loadPixelNoteAnims()
@@ -414,21 +423,18 @@ class Note extends FlxSprite
 		}
 	}
 
-	override public function destroy()
-	{
-		super.destroy();
-		_lastValidChecked = '';
-	}
-
 	public function followStrumNote(myStrum:StrumNote, fakeCrochet:Float, songSpeed:Float = 1)
 	{
-		var strumX:Float = myStrum.x;
-		var strumY:Float = myStrum.y;
-		var strumAngle:Float = myStrum.angle;
-		var strumAlpha:Float = myStrum.alpha;
+		if (strum == null && autoPickStrum)
+			strum = myStrum;
+		// susStrip.clear();
+		var strumX:Float = strum.x;
+		var strumY:Float = strum.y;
+		var strumAngle:Float = strum.angle;
+		var strumAlpha:Float = strum.alpha;
 
 		distance = (0.45 * (strumTime - Conductor.songPosition) * songSpeed * multSpeed);
-		if (myStrum.downScroll)
+		if (strum.downScroll)
 			distance *= -1;
 
 		if (copyAngle)
@@ -442,10 +448,107 @@ class Note extends FlxSprite
 
 		if (copyY)
 			y = strumY + offsetY + correctionOffset + distance;
+		if(copyShader)
+			shader = strum.rgbShader.parent.shader;
+		if (scrollSpeed != songSpeed * multSpeed)
+			scrollSpeed = songSpeed * multSpeed;
+
+		if (!hit)
+			holdNote?.updatePos();
 	}
+
+	var autoPickStrum = true;
+	public var copyShader = true;
 
 	public function clipToStrumNote(myStrum:StrumNote)
 	{
 		return;
+	}
+
+	var strum:StrumNote;
+	var scrollSpeed:Float = 1;
+
+	override function draw()
+	{
+		if (hit && holdNote != null)
+		{
+			holdNote.hit = true;
+			holdNote.timeStuff = Conductor.songPosition - strumTime;
+		}
+
+		if (!hit)
+			super.draw();
+	}
+
+	override function destroy()
+	{
+		_lastValidChecked = '';
+		super.destroy();
+	}
+}
+
+class Sustain extends TiledRenderer
+{
+	private var lastFlip = false;
+
+	public var hit = false;
+
+	private var lastSpeed = -1.0;
+
+	public var timeStuff = 0.;
+
+	private var mA = 0.6;
+
+	public var parent:Note;
+
+	public function updateVisuals(speed:Float = 1, flipped:Bool = false)
+	{
+		final dirty = lastFlip != flipped || lastSpeed != speed || hit;
+
+		if (alpha != parent.alpha * mA)
+			alpha = parent.alpha * mA;
+		if (antialiasing != parent.antialiasing)
+			antialiasing = parent.antialiasing;
+		if (shader != parent.shader)
+			shader = parent.shader;
+		if (!dirty)
+			return;
+		lastFlip = flipped;
+		lastSpeed = speed;
+		height = (0.45 * speed * (parent.sustainLength - timeStuff));
+		angle = lastFlip ? 180 : 0;
+	}
+
+	public function updatePos()
+	{
+		final tx = parent.x + (parent.width * 0.5 - width * 0.5);
+		if (x != tx)
+			x = tx;
+		@:privateAccess
+		if (hit)
+		{
+			y = parent.strum.y + parent.height * 0.5;
+			parent.y = parent.strum.y;
+			return;
+		}
+		y = parent.y + parent.height * 0.5;
+	}
+
+	public function new(p:Note)
+	{
+		super();
+		parent = p;
+		reloadSkin();
+	}
+
+	public function reloadSkin()
+	{
+		frames = parent.frames;
+		animation.copyFrom(parent.animation);
+		animation.play('hold');
+		setTailAnim('holdend');
+		scale.copyFrom(parent.scale);
+		updateHitbox();
+		origin.y = offset.y = 0;
 	}
 }

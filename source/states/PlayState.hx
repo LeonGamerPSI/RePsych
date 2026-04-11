@@ -16,6 +16,7 @@ import flixel.util.FlxSave;
 import flixel.input.keyboard.FlxKey;
 import flixel.animation.FlxAnimationController;
 import lime.utils.Assets;
+import objects.Note;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.events.KeyboardEvent;
 import haxe.Json;
@@ -154,6 +155,7 @@ class PlayState extends MusicBeatState
 	public var boyfriend:Character = null;
 
 	public var notes:FlxTypedGroup<Note>;
+	public var sustains:FlxTypedGroup<Sustain>;
 	public var unspawnNotes:Array<Note> = [];
 	public var eventNotes:Array<EventNote> = [];
 
@@ -507,6 +509,9 @@ class PlayState extends MusicBeatState
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
 		noteGroup.add(strumLineNotes);
 
+		sustains = new FlxTypedGroup<Sustain>();
+		noteGroup.add(sustains);
+
 		if (ClientPrefs.data.timeBarType == 'Song Name')
 		{
 			timeTxt.size = 24;
@@ -568,6 +573,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
 		scoreTxt.visible = !ClientPrefs.data.hideHud;
+		scoreTxt.antialiasing = true;
 		updateScore(false);
 		uiGroup.add(scoreTxt);
 
@@ -1147,7 +1153,7 @@ class PlayState extends MusicBeatState
 			str += ' (${percent}%) - ${ratingFC}';
 		}
 
-		var tempScore:String = 'Score: ${songScore}' + (!instakillOnMiss ? ' | Misses: ${songMisses}' : "") + ' | Rating: ${str}';
+		var tempScore:String = 'Score: ${songScore}' + (!instakillOnMiss ? ' • Combo Breaks: ${songMisses}' : "") + ' • Acc: ${str}';
 		// "tempScore" variable is used to prevent another memory leak, just in case
 		// "\n" here prevents the text from being cut off by beat zooms
 		scoreTxt.text = '${tempScore}\n';
@@ -1666,6 +1672,11 @@ class PlayState extends MusicBeatState
 			FlxG.camera.followLerp = 0;
 		callOnScripts('onUpdate', [elapsed]);
 
+		if (startedCountdown && !paused && Conductor.songPosition < 0)
+			Conductor.songPosition += FlxG.elapsed * 1000 * playbackRate;
+		else if (startedCountdown && Conductor.songPosition >= 0 && !paused)
+			Conductor.songPosition = FlxG.sound.music.time;
+
 		super.update(elapsed);
 
 		setOnScripts('curDecStep', curDecStep);
@@ -1699,11 +1710,6 @@ class PlayState extends MusicBeatState
 
 		updateIconsScale(elapsed);
 		updateIconsPosition();
-
-		if (startedCountdown && !paused && Conductor.songPosition < 0)
-			Conductor.songPosition += FlxG.elapsed * 1000 * playbackRate;
-		else if (startedCountdown && Conductor.songPosition >= 0 && !paused)
-			Conductor.songPosition = FlxG.sound.music.time;
 
 		if (startingSong)
 		{
@@ -1762,6 +1768,11 @@ class PlayState extends MusicBeatState
 				dunceNote.spawned = true;
 
 				callOnHScript('onSpawnNote', [dunceNote]);
+				if (dunceNote.sustainLength > 0)
+				{
+					var sustain = dunceNote.holdNote = new Sustain(dunceNote);
+					sustains.add(sustain);
+				}
 
 				var index:Int = unspawnNotes.indexOf(dunceNote);
 				unspawnNotes.splice(index, 1);
@@ -1796,11 +1807,32 @@ class PlayState extends MusicBeatState
 								if (cpuControlled && !daNote.blockHit && daNote.canBeHit && (daNote.strumTime <= Conductor.songPosition))
 									goodNoteHit(daNote);
 							}
-							else if (daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
+							else if (daNote.wasGoodHit && !daNote.ignoreNote)
 								opponentNoteHit(daNote);
+							if (daNote.hit && daNote.strumTime + daNote.sustainLength <= Conductor.songPosition)
+							{
+								@:privateAccess
+								if (!daNote.mustPress)
+								{
+									daNote.strum.playAnim('confirm', true);
+									daNote.strum.resetAnim = (Conductor.stepCrochet * 1.5 / 1000 / playbackRate);
+								}
 
+								invalidateNote(daNote);
+							}
+							if(daNote.mustPress && daNote.hit && !strum.holding) {
+								noteMiss(daNote);
+								invalidateNote(daNote);
+							}
+							@:privateAccess
+							if (daNote.holdNote != null)
+							{
+								daNote.holdNote.hit = daNote.hit;
+								daNote.holdNote.updateVisuals(daNote.scrollSpeed, daNote.strum.downScroll);
+								daNote.holdNote.updatePos();
+							}
 							// Kill extremely late notes and cause misses
-							if (Conductor.songPosition - daNote.strumTime > noteKillOffset)
+							if (Conductor.songPosition - daNote.strumTime > noteKillOffset && !daNote.hit)
 							{
 								if (daNote.mustPress && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit))
 									noteMiss(daNote);
@@ -2909,6 +2941,9 @@ class PlayState extends MusicBeatState
 			for (i in 0...releaseArray.length)
 				if (releaseArray[i] || strumsBlocked[i] == true)
 					keyReleased(i);
+		playerStrums.forEachAlive((s)->{
+			s.holding = holdArray[s.noteData % holdArray.length];
+		});
 	}
 
 	function noteMiss(daNote:Note):Void
@@ -3033,7 +3068,8 @@ class PlayState extends MusicBeatState
 
 	function opponentNoteHit(note:Note):Void
 	{
-		callOnHScript('opponentNoteHitPre', [note]);
+		if (!note.hit)
+			callOnHScript('opponentNoteHitPre', [note]);
 
 		if (songName != 'tutorial')
 			camZooming = true;
@@ -3066,12 +3102,14 @@ class PlayState extends MusicBeatState
 
 		if (opponentVocals.length <= 0)
 			vocals.volume = 1;
-		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+		strumPlayAnim(true, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate, !note.hit);
 		note.hitByOpponent = true;
 
-		callOnHScript('opponentNoteHit', [note]);
+		if (!note.hit)
+			callOnHScript('opponentNoteHit', [note]);
 
-		invalidateNote(note);
+		note.hit = true;
+		// invalidateNote(note);
 	}
 
 	public function goodNoteHit(note:Note):Void
@@ -3081,16 +3119,15 @@ class PlayState extends MusicBeatState
 		if (cpuControlled && note.ignoreNote)
 			return;
 
-		var isSus:Bool = false; // GET OUT OF MY HEAD, GET OUT OF MY HEAD, GET OUT OF MY HEAD
-		var leData:Int = Math.round(Math.abs(note.noteData));
-		var leType:String = note.noteType;
+		if (!note.hit)
+		{
+			callOnHScript('goodNoteHitPre', [note]);
 
-		callOnHScript('goodNoteHitPre', [note]);
+			note.wasGoodHit = true;
 
-		note.wasGoodHit = true;
-
-		if (ClientPrefs.data.hitsoundVolume > 0 && !note.hitsoundDisabled)
-			FlxG.sound.play(Paths.sound(note.hitsound), ClientPrefs.data.hitsoundVolume);
+			if (ClientPrefs.data.hitsoundVolume > 0 && !note.hitsoundDisabled)
+				FlxG.sound.play(Paths.sound(note.hitsound), ClientPrefs.data.hitsoundVolume);
+		}
 
 		if (note.hitCausesMiss)
 		{
@@ -3108,7 +3145,7 @@ class PlayState extends MusicBeatState
 			}
 
 			noteMiss(note);
-			if (!note.noteSplashData.disabled)
+			if (!note.noteSplashData.disabled && !note.hit)
 				spawnNoteSplashOnNote(note);
 
 			invalidateNote(note);
@@ -3154,22 +3191,19 @@ class PlayState extends MusicBeatState
 			strumPlayAnim(false, Std.int(Math.abs(note.noteData)), Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
 		vocals.volume = 1;
 
-		if (!note.ignoreNote)
+		if (note != null && !note.hit)
 		{
+			health += note.hitHealth * healthGain;
+
+			if (!note.hit)
+				callOnHScript('goodNoteHit', [note]);
+
 			combo++;
 			if (combo > 9999)
 				combo = 9999;
 			popUpScore(note);
+			note.hit = true;
 		}
-		var gainHealth:Bool = true; // prevent health gain, *if* sustains are treated as a singular note
-		if (guitarHeroSustains)
-			gainHealth = false;
-		if (gainHealth)
-			health += note.hitHealth * healthGain;
-
-		callOnHScript('goodNoteHit', [note]);
-
-		invalidateNote(note);
 	}
 
 	public function invalidateNote(note:Note):Void
@@ -3177,6 +3211,9 @@ class PlayState extends MusicBeatState
 		note.kill();
 		notes.remove(note, true);
 		note.destroy();
+		sustains.remove(note.holdNote, true);
+		note.holdNote?.destroy();
+		note.holdNote = null;
 	}
 
 	public function spawnNoteSplashOnNote(note:Note)
@@ -3518,7 +3555,7 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	function strumPlayAnim(isDad:Bool, id:Int, time:Float)
+	function strumPlayAnim(isDad:Bool, id:Int, time:Float, f:Bool = true)
 	{
 		var spr:StrumNote = null;
 		if (isDad)
@@ -3532,7 +3569,7 @@ class PlayState extends MusicBeatState
 
 		if (spr != null)
 		{
-			spr.playAnim('confirm', true);
+			spr.playAnim('confirm', f);
 			spr.resetAnim = time;
 		}
 	}

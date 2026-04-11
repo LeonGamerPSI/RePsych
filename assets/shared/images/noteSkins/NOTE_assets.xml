@@ -8,7 +8,7 @@ Created with Funkin Packer v0.1.3 https://neeeoo.github.io/funkin-packer/
 	<SubTexture name="arrowRIGHT0000" x="3088" y="5" width="157" height="154" rotated="true" frameX="-0" frameY="-0" frameWidth="154" frameHeight="157"/>
 	<SubTexture name="arrowUP0000" x="3255" y="5" width="157" height="154" frameX="-0" frameY="-0" frameWidth="157" frameHeight="154"/>
 	<SubTexture name="blue0000" x="3422" y="5" width="157" height="154" frameX="-0" frameY="-0" frameWidth="157" frameHeight="154"/>
-	<SubTexture name="blue hold end0000" x="5341" y="5" width="64" height="50" rotated="true" frameX="-0" frameY="-0" frameWidth="50" frameHeight="64"/>
+	<SubTexture name="blue hold end0000" x="5341" y="5" width="50" height="64" />
 	<SubTexture name="blue hold piece0000" x="5415" y="5" width="50" height="43" frameX="-0" frameY="-0" frameWidth="50" frameHeight="43"/>
 	<SubTexture name="down confirm0000" x="5" y="5" width="229" height="228" frameX="-2" frameY="-1" frameWidth="238" frameHeight="235"/>
 	<SubTexture name="down confirm0001" x="244" y="5" width="229" height="228" frameX="-2" frameY="-1" frameWidth="238" frameHeight="235"/>
@@ -19,7 +19,7 @@ Created with Funkin Packer v0.1.3 https://neeeoo.github.io/funkin-packer/
 	<SubTexture name="down press0002" x="4414" y="5" width="149" height="146" frameX="-0" frameY="-0" frameWidth="149" frameHeight="146"/>
 	<SubTexture name="down press0003" x="4414" y="5" width="149" height="146" frameX="-0" frameY="-0" frameWidth="149" frameHeight="146"/>
 	<SubTexture name="green0000" x="3589" y="5" width="157" height="154" frameX="-0" frameY="-0" frameWidth="157" frameHeight="154"/>
-	<SubTexture name="green hold end0000" x="5341" y="5" width="64" height="50" rotated="true" frameX="-0" frameY="-0" frameWidth="50" frameHeight="64"/>
+	<SubTexture name="green hold end0000" x="5341" y="5" width="50" height="64" />
 	<SubTexture name="green hold piece0000" x="5415" y="5" width="50" height="43" frameX="-0" frameY="-0" frameWidth="50" frameHeight="43"/>
 	<SubTexture name="left confirm0000" x="1870" y="5" width="214" height="212" rotated="true" frameX="-4" frameY="-6" frameWidth="225" frameHeight="228"/>
 	<SubTexture name="left confirm0001" x="2094" y="5" width="214" height="212" rotated="true" frameX="-4" frameY="-6" frameWidth="225" frameHeight="228"/>
@@ -30,10 +30,10 @@ Created with Funkin Packer v0.1.3 https://neeeoo.github.io/funkin-packer/
 	<SubTexture name="left press0002" x="4573" y="5" width="149" height="146" rotated="true" frameX="-0" frameY="-0" frameWidth="146" frameHeight="149"/>
 	<SubTexture name="left press0003" x="4573" y="5" width="149" height="146" rotated="true" frameX="-0" frameY="-0" frameWidth="146" frameHeight="149"/>
 	<SubTexture name="purple0000" x="3756" y="5" width="157" height="154" rotated="true" frameX="-0" frameY="-0" frameWidth="154" frameHeight="157"/>
-	<SubTexture name="purple hold end0000" x="5341" y="5" width="64" height="50" rotated="true" frameX="-0" frameY="-0" frameWidth="50" frameHeight="64"/>
+	<SubTexture name="purple hold end0000" x="5341" y="5" width="50" height="64" />
 	<SubTexture name="purple hold piece0000" x="5415" y="5" width="50" height="43" frameX="-0" frameY="-0" frameWidth="50" frameHeight="43"/>
 	<SubTexture name="red0000" x="3923" y="5" width="157" height="154" rotated="true" frameX="-0" frameY="-0" frameWidth="154" frameHeight="157"/>
-	<SubTexture name="red hold end0000" x="5341" y="5" width="64" height="50" rotated="true" frameX="-0" frameY="-0" frameWidth="50" frameHeight="64"/>
+	<SubTexture name="red hold end0000" x="5341" y="5" width="50" height="64" />
 	<SubTexture name="red hold piece0000" x="5415" y="5" width="50" height="43" frameX="-0" frameY="-0" frameWidth="50" frameHeight="43"/>
 	<SubTexture name="right confirm0000" x="1414" y="5" width="218" height="217" rotated="true" frameX="-1" frameY="-5" frameWidth="226" frameHeight="230"/>
 	<SubTexture name="right confirm0001" x="1642" y="5" width="218" height="217" rotated="true" frameX="-1" frameY="-5" frameWidth="226" frameHeight="230"/>
