@@ -51,6 +51,10 @@
 			{
 				"name": "box2d",
 				"link": "https://github.com/openfl/box2d.git"
+			},
+			{
+				"name": "flixel-animate",
+				"link": "https://github.com/MaybeMaru/flixel-animate"
 			}
 		]
 	}

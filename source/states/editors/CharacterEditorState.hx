@@ -17,6 +17,7 @@ import openfl.utils.Assets;
 import lime.system.Clipboard;
 import objects.Character;
 import objects.HealthIcon;
+import animate.FlxAnimate;
 import objects.Bar;
 
 @:bitmap("assets/images/debugger/cursorCross.png")
@@ -351,10 +352,10 @@ class CharacterEditorState extends MusicBeatState
 				if (animateGhost == null) // If I created the animateGhost on create() and you didn't load an atlas, it would crash the game on destroy, so we create it here
 				{
 					animateGhost = new FlxAnimate(ghost.x, ghost.y);
-					animateGhost.showPivot = false;
 					insert(members.indexOf(ghost), animateGhost);
 					animateGhost.active = false;
 				}
+
 
 				if (animateGhost == null || animateGhostImage != character.imageFile)
 					Paths.loadAnimateAtlas(animateGhost, character.imageFile);
@@ -364,7 +365,7 @@ class CharacterEditorState extends MusicBeatState
 				else
 					animateGhost.anim.addBySymbol('anim', myAnim.name, 0, false);
 
-				animateGhost.anim.play('anim', true, false, character.atlas.anim.curFrame);
+				animateGhost.anim.play('anim', true, false, character.atlas.anim.curAnim.curFrame);
 				animateGhost.anim.pause();
 
 				animateGhostImage = character.imageFile;
@@ -554,7 +555,7 @@ class CharacterEditorState extends MusicBeatState
 						if (!character.isAnimateAtlas)
 							character.animation.remove(animationInputText.text);
 						else
-							@:privateAccess character.atlas.anim.animsMap.remove(animationInputText.text);
+							@:privateAccess character.atlas.anim.remove(animationInputText.text);
 					}
 					character.animationsArray.remove(anim);
 				}
@@ -586,7 +587,7 @@ class CharacterEditorState extends MusicBeatState
 						if (!character.isAnimateAtlas)
 							character.animation.remove(anim.anim);
 						else
-							@:privateAccess character.atlas.anim.animsMap.remove(anim.anim);
+							@:privateAccess character.atlas.anim.remove(anim.anim);
 						character.animOffsets.remove(anim.anim);
 						character.animationsArray.remove(anim);
 					}
@@ -824,7 +825,7 @@ class CharacterEditorState extends MusicBeatState
 		if (Paths.fileExists('images/' + character.imageFile + '/Animation.json', TEXT))
 		{
 			character.atlas = new FlxAnimate();
-			character.atlas.showPivot = false;
+
 			try
 			{
 				Paths.loadAnimateAtlas(character.atlas, character.imageFile);
@@ -1074,8 +1075,8 @@ class CharacterEditorState extends MusicBeatState
 			}
 			else
 			{
-				frames = character.atlas.anim.curFrame;
-				length = character.atlas.anim.length;
+				frames = character.atlas.anim.curAnim.curFrame;
+				length = character.atlas.anim.curAnim.numFrames;
 			}
 
 			if (FlxG.keys.justPressed.A || FlxG.keys.justPressed.D || holdingFrameTime > 0.5)
@@ -1091,7 +1092,7 @@ class CharacterEditorState extends MusicBeatState
 					if (!character.isAnimateAtlas)
 						character.animation.curAnim.curFrame = frames;
 					else
-						character.atlas.anim.curFrame = frames;
+						character.atlas.anim.curAnim.curFrame = frames;
 					holdingFrameElapsed -= 0.1;
 				}
 			}

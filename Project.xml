@@ -109,7 +109,7 @@
 	<haxelib name="SScript" if="HSCRIPT_ALLOWED" />
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" />
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED" />
-	<haxelib name="flxanimate" />
+	<haxelib name="flixel-animate" />
 	<haxelib name="box2d" />
 
 	<!-- Disable Discord IO Thread -->

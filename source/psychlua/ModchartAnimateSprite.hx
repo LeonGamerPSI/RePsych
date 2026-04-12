@@ -1,12 +1,13 @@
 package psychlua;
 
-#if flxanimate
+
 class ModchartAnimateSprite extends FlxAnimate
 {
 	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
-	public function new(?x:Float = 0, ?y:Float = 0, ?path:String, ?settings:FlxAnimate.Settings)
+	public function new(?x:Float = 0, ?y:Float = 0, ?path:String)
 	{
-		super(x, y, path, settings);
+		super(x, y);
+		Paths.loadAnimateAtlas(this,path);
 		antialiasing = ClientPrefs.data.antialiasing;
 	}
 
@@ -23,4 +24,3 @@ class ModchartAnimateSprite extends FlxAnimate
 		animOffsets.set(name, [x, y]);
 	}
 }
-#end

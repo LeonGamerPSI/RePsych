@@ -275,6 +275,7 @@ class PlayState extends MusicBeatState
 
 	override public function create()
 	{
+		#if debugged isStoryMode = true; #end
 		// trace('Playback Rate: ' + playbackRate);
 		Paths.clearStoredMemory();
 

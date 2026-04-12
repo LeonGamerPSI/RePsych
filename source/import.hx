@@ -23,6 +23,7 @@ import js.html.*;
 
 import backend.Paths;
 import backend.Controls;
+
 import backend.CoolUtil;
 import backend.MusicBeatState;
 import backend.MusicBeatSubstate;
@@ -39,9 +40,7 @@ import objects.BGSprite;
 import states.PlayState;
 import states.LoadingState;
 
-#if flxanimate
-import flxanimate.*;
-#end
+import animate.*;
 
 //Flixel
 import flixel.sound.FlxSound;
