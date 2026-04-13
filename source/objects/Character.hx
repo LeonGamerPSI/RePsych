@@ -236,7 +236,7 @@ class Character extends FlxSprite
 		if (isAnimateAtlas)
 			atlas.update(elapsed);
 
-		if (debugMode || (!isAnimateAtlas && animation.curAnim == null) || (isAnimateAtlas && atlas.anim.curAnim != null))
+		if (debugMode || (!isAnimateAtlas && animation.curAnim == null) || (isAnimateAtlas && atlas.anim.curAnim == null))
 		{
 			super.update(elapsed);
 			return;
@@ -320,7 +320,7 @@ class Character extends FlxSprite
 	{
 		if (isAnimationNull())
 			return false;
-		return !isAnimateAtlas ? animation.curAnim.finished : atlas.anim.finished;
+		return !isAnimateAtlas ? animation.curAnim.finished : atlas.anim.curAnim.finished;
 	}
 
 	public function finishAnimation():Void
