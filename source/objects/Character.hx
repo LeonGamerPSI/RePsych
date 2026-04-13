@@ -141,7 +141,8 @@ class Character extends FlxSprite
 	{
 		isAnimateAtlas = false;
 
-		var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT, null, true);
+		var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT,null,true);
+		trace(animToFind);
 		if (#if MODS_ALLOWED FileSystem.exists(animToFind) || #end Assets.exists(animToFind))
 			isAnimateAtlas = true;
 
@@ -155,7 +156,7 @@ class Character extends FlxSprite
 			atlas = new FlxAnimate();
 			try
 			{
-				atlas.frames = FlxAnimateFrames.fromAnimate(Paths.getPath('images/' + json.image));
+				atlas.frames = FlxAnimateFrames.fromAnimate(Paths.getPath('images/' + json.image,null,null,true));
 			}
 			catch (e:Dynamic)
 			{

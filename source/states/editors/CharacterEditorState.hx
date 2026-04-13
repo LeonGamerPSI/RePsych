@@ -828,13 +828,14 @@ class CharacterEditorState extends MusicBeatState
 
 			try
 			{
+							character.isAnimateAtlas = true;
 				Paths.loadAnimateAtlas(character.atlas, character.imageFile);
 			}
 			catch (e:Dynamic)
 			{
 				FlxG.log.warn('Could not load atlas ${character.imageFile}: $e');
 			}
-			character.isAnimateAtlas = true;
+
 		}
 		else if (Paths.fileExists('images/' + character.imageFile + '.txt', TEXT))
 			character.frames = Paths.getPackerAtlas(character.imageFile);
