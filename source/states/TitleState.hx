@@ -21,6 +21,7 @@ class TitleState extends MusicBeatState
 
 	override function create()
 	{
+		ClientPrefs.loadPrefs();
 		super.create();
 		gf.screenCenter();
 		gf.active = false;

@@ -88,6 +88,7 @@ class Option
 
 	public function change()
 	{
+	
 		//nothing lol
 		if(onChange != null)
 			onChange();
@@ -102,6 +103,7 @@ class Option
 
 	dynamic public function setValue(value:Dynamic)
 	{
+		
 		if(type == 'keybind')
 		{
 			var keys = Reflect.getProperty(ClientPrefs.data, variable);

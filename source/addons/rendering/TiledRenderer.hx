@@ -96,7 +96,7 @@ class TiledRenderer extends FlxSprite {
 			_matrix.ty = Math.floor(_matrix.ty);
 		}
 
-		final batch:FlxDrawQuadsItem = camera.startQuadBatch(_frame.parent, colorTransform?.hasRGBMultipliers(), colorTransform?.hasRGBAOffsets(), blend, antialiasing, shader);
+		
 
 		final bodyIndex:Int = flipY ? tileCount - 1 : 0;
         final tailIndex:Int = flipY ? 0 : tileCount - 1;
@@ -108,6 +108,7 @@ class TiledRenderer extends FlxSprite {
 		}
 
 		for (i in 0...tileCount) {
+			final batch:FlxDrawQuadsItem = camera.startQuadBatch(_frame.parent, colorTransform?.hasRGBMultipliers(), colorTransform?.hasRGBAOffsets(), blend, antialiasing, shader);
 			final frameToDraw:FlxFrame = i == tailIndex ? tailFrame ?? _frame : _frame;
 			var offsetAmount:Float = (flipY ? _frame.frame.height : frameToDraw.frame.height) * absScaleY;
 

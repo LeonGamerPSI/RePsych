@@ -586,8 +586,22 @@ class Paths
 
 	public static function fromAtlas(path:String, ?library:String, correct:Bool = true)
 	{
-		var atlas = FlxAnimateFrames.fromAnimate(Paths.getPath('images/' + path, null, library, true).replace(library + ':',''));
-		trace(Paths.getPath('images/' + path, null, library, true).replace(library + ':',''));
+		var path = Paths.getPath('images/' + path, null, library, true).replace(library + ':', '');
+		if (!correct)
+			Paths.getPath('images/' + path, null, library, true);
+		var atlas = FlxAnimateFrames.fromAnimate(path);
+		trace(path);
+		atlas.parent.destroyOnNoUse = false;
+		atlas.parent.persist = true;
+		currentTrackedAssets.set(atlas.parent.assetsKey, atlas.parent);
+		localTrackedAssets.push(atlas.parent.assetsKey);
+		if (ClientPrefs.data.cacheOnGPU)
+		{
+			var bitmap = atlas.parent.bitmap;
+			bitmap.disposeImage();
+
+		}
+
 		return atlas;
 	}
 }

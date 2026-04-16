@@ -49,8 +49,8 @@ class InitState extends MusicBeatState
 		FlxG.save.bind('funkin', CoolUtil.getSavePath());
 
 		ClientPrefs.loadPrefs();
-		//lemonui.Constants.FONT_REGULAR = Paths.font('Inconsolata-Medium.ttf');
-		//lemonui.Constants.FONT_BOLD = Paths.font('Inconsolata-Bold.ttf');
+		lemonui.Constants.FONT_REGULAR = Paths.font('Inconsolata-Medium.ttf');
+		lemonui.Constants.FONT_BOLD = Paths.font('Inconsolata-Bold.ttf');
 		new backend.plugins.ReloadPlugin();
 
 		#if CHECK_FOR_UPDATES
